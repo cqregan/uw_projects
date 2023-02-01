@@ -1,6 +1,167 @@
 ---
-title: "Deliverable 1"
-output: html_notebook
+title: "index"
+output:
+  html_document:
+    df_print: paged
 ---
 
+```{r}
+location='https://github.com/cqregan/uw_projects/raw/main/'
+file='Use_Of_Force.csv'
+link=paste0(location,file)
+link
+```
+
+```{r}
+#getting the data TABLE from the file in the cloud:
+df = read.csv(file=url(link))
+df
+```
+
+
+```{r}
+names(df)
+```
+```{r}
+str(df,width = 70,strict.width='cut')
+```
+```{r}
+head(df$Precinct,20)
+```
+
+```{r}
+absoluteT=table(df$Precinct,
+                exclude = 'nothing') 
+absoluteT
+```
+
+```{r}
+prop.table(absoluteT)
+```
+
+```{r}
+propT=prop.table(absoluteT)*100
+
+propT
+```
+
+```{r}
+```
+
+
+```{r}
+names(absoluteT)[1]='Unknown'
+```
+
+
+```{r}
+names(absoluteT)[2]='Unknown'
+```
+
+```{r}
+names(absoluteT)[9]='Unknown'
+```
+
+```{r}
+dfCleaned = df
+dfCleaned["Precinct"][dfCleaned["Precinct"] == "X"] <- "Unknown"
+dfCleaned["Precinct"][dfCleaned["Precinct"] == "0"] <- "Unknown"
+dfCleaned["Precinct"][dfCleaned["Precinct"] == "-"] <- "Unknown"
+dfCleaned
+```
+```{r}
+absoluteT=table(dfCleaned$Precinct,
+                exclude = 'nothing') 
+dfCleaned
+```
+```{r}
+prop.table(absoluteT)
+
+```
+```{r}
+propT=prop.table(absoluteT)*100
+propT
+```
+
+```{r}
+(tableFreq=as.data.frame(absoluteT))
+```
+
+```{r}
+names(tableFreq)=c("Precinct","Count")
+tableFreq$Percent=as.vector(propT)
+tableFreq
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r}
+base= ggplot(data = tableFreq, 
+             aes(x = Precinct,
+                 y = Count)) 
+```
+
+```{r}
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') 
+plot1
+```
+
+```{r}
+titleText='How frequently do police precincts in Seattle use force?'
+sourceText='Source: City of Seattle'
+
+plot2 = plot1 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText) 
+plot2
+```
+```{r}
+tableFreq=tableFreq[order(tableFreq$Percent),]
+# then:
+tableFreq
+```
+
+```{r}
+(PrecinctOrd=tableFreq[order(tableFreq$Percent),'Precinct'])
+```
+
+```{r}
+plot2
+```
+
+```{r}
+base= base + scale_x_discrete(limits=PrecinctOrd) 
+base= base + theme_classic()
+##
+plot1 = base + geom_bar(fill ="gray",
+                        stat = 'identity') 
+plot2 = plot1 + labs(title=titleText,
+                     x =NULL, 
+                     y = NULL,
+                     caption = sourceText)
+
+plot2
+```
+```{r}
+str(df,width = 50,strict.width='cut')
+```
+
+```{r}
+
+dfCleaned[['Occured_date_time']] <- as.Date(dfCleaned[['Occured_date_time']], format = "%m/%d/%y")
+dfCleaned
+
+```
+```{r}
+baseHY=ggplot(data=dfCleaned,
+            aes(x=Occured_date_time)) 
+histHY=baseHY + geom_histogram(aes(fill=Precinct), 
+                              color='black')
+histHY
+  
+```
 
